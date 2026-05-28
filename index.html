@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentScope — AI Agent Permissions, Without the Pain</title>
+    <meta name="description" content="Stop approving every command. AgentScope gives your AI agents task-based permissions — approve the mission, not every mouse click.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --text: #e0e0e8;
+            --text-muted: #8888a0;
+            --accent: #6c5ce7;
+            --accent-glow: #6c5ce740;
+            --green: #00d2a0;
+            --red: #ff4757;
+            --orange: #ffa502;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+        /* NAV */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            background: #0a0a0fdd; backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+        .logo span { color: var(--text-muted); font-weight: 400; }
+        .nav-cta {
+            background: var(--accent); color: white; border: none; padding: 8px 20px;
+            border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+
+        /* HERO */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 6px 16px; border-radius: 100px; font-size: 0.85rem;
+            color: var(--text-muted); margin-bottom: 32px;
+        }
+        .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800; line-height: 1.1;
+            margin-bottom: 24px;
+        }
+        .hero h1 em { font-style: normal; color: var(--accent); }
+        .hero p {
+            font-size: 1.25rem; color: var(--text-muted);
+            max-width: 640px; margin: 0 auto 40px;
+        }
+        .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary {
+            background: var(--accent); color: white; border: none; padding: 14px 32px;
+            border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; text-decoration: none; display: inline-block;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+        .btn-secondary {
+            background: var(--surface); color: var(--text); border: 1px solid var(--border);
+            padding: 14px 32px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
+        }
+        .btn-secondary:hover { border-color: var(--accent); }
+
+        /* PROBLEM */
+        .problem { padding: 100px 0; }
+        .section-label {
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--accent); font-weight: 600; margin-bottom: 16px;
+        }
+        .section-title { font-size: 2.25rem; font-weight: 700; margin-bottom: 48px; }
+
+        .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .pain-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px;
+            transition: border-color 0.3s;
+        }
+        .pain-card:hover { border-color: var(--red); }
+        .pain-icon { font-size: 2rem; margin-bottom: 16px; }
+        .pain-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+        .pain-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* HOW IT WORKS */
+        .how { padding: 100px 0; background: var(--surface); }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin-top: 48px; }
+        .step {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px;
+        }
+        .step-num {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--accent); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.1rem; margin-bottom: 20px;
+        }
+        .step h3 { font-size: 1.15rem; margin-bottom: 8px; }
+        .step p { color: var(--text-muted); font-size: 0.95rem; }
+        .step code {
+            display: block; margin-top: 16px; padding: 12px 16px;
+            background: #1a1a2e; border-radius: 8px; font-size: 0.85rem;
+            color: var(--green); overflow-x: auto;
+        }
+
+        /* DEMO */
+        .demo { padding: 100px 0; }
+        .terminal {
+            background: #0d0d14; border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; max-width: 700px;
+            margin: 48px auto 0;
+        }
+        .terminal-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 16px; background: #16161f; border-bottom: 1px solid var(--border);
+        }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .terminal-dot.r { background: var(--red); }
+        .terminal-dot.y { background: var(--orange); }
+        .terminal-dot.g { background: var(--green); }
+        .terminal-body { padding: 20px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.8; }
+        .terminal-body .prompt { color: var(--accent); }
+        .terminal-body .cmd { color: var(--text); }
+        .terminal-body .ok { color: var(--green); }
+        .terminal-body .warn { color: var(--orange); }
+        .terminal-body .deny { color: var(--red); }
+        .terminal-body .comment { color: var(--text-muted); }
+
+        /* PRICING */
+        .pricing { padding: 100px 0; background: var(--surface); }
+        .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; }
+        .price-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 40px; position: relative;
+        }
+        .price-card.featured { border-color: var(--accent); }
+        .price-card.featured::after {
+            content: 'MOST POPULAR';
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: white; padding: 4px 16px;
+            border-radius: 100px; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
+        }
+        .price-card h3 { font-size: 1.25rem; margin-bottom: 8px; }
+        .price { font-size: 3rem; font-weight: 800; margin-bottom: 4px; }
+        .price span { font-size: 1rem; font-weight: 400; color: var(--text-muted); }
+        .price-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .feature-list { list-style: none; margin-bottom: 32px; }
+        .feature-list li { padding: 8px 0; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+        .feature-list li::before { content: '✓'; color: var(--green); font-weight: 700; }
+
+        /* SOCIAL PROOF */
+        .proof { padding: 80px 0; text-align: center; }
+        .stats { display: flex; justify-content: center; gap: 64px; flex-wrap: wrap; margin-top: 40px; }
+        .stat-num { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* CTA */
+        .final-cta {
+            padding: 100px 0; text-align: center;
+            background: linear-gradient(180deg, var(--bg) 0%, #0f0f1a 100%);
+        }
+        .final-cta h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; }
+        .final-cta p { color: var(--text-muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+        .waitlist-form {
+            display: flex; gap: 12px; max-width: 480px; margin: 0 auto;
+            flex-wrap: wrap; justify-content: center;
+        }
+        .waitlist-form input {
+            flex: 1; min-width: 240px; padding: 14px 20px; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--surface);
+            color: var(--text); font-size: 1rem; outline: none;
+        }
+        .waitlist-form input:focus { border-color: var(--accent); }
+        .waitlist-form button { padding: 14px 28px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .waitlist-form button:hover { box-shadow: 0 8px 30px var(--accent-glow); }
+        .form-success { color: var(--green); font-size: 1.1rem; margin-top: 16px; display: none; }
+
+        /* FOOTER */
+        footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2rem; }
+            .section-title { font-size: 1.75rem; }
+            .stats { gap: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">AgentScope<span> — permissions, simplified</span></a>
+            <a href="#waitlist" class="nav-cta">Get Early Access</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="badge"><span class="dot"></span> Now in Early Access</div>
+            <h1>Stop Approving<br>Every <em>Command</em></h1>
+            <p>Your AI agent asks permission 50 times per session. AgentScope replaces permission fatigue with task-based authorization — approve the mission, not every mouse click.</p>
+            <div class="hero-actions">
+                <a href="#waitlist" class="btn-primary">Join Waitlist →</a>
+                <a href="#demo" class="btn-secondary">See It in Action</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="problem">
+        <div class="container">
+            <div class="section-label">The Problem</div>
+            <div class="section-title">Current agent permissions are broken.</div>
+            <div class="pain-grid">
+                <div class="pain-card">
+                    <div class="pain-icon">🔴</div>
+                    <h3>YOLO Mode</h3>
+                    <p>Approve everything. One rogue command can delete your database, push to production, or leak secrets. Hope for the best.</p>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">🟡</div>
+                    <h3>Permission Fatigue</h3>
+                    <p>Approve each action manually. 50 "Continue? Y/N" prompts per session. You stop reading and start auto-approving. Same risk as YOLO.</p>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">⚫</div>
+                    <h3>No Middle Ground</h3>
+                    <p>Binary approve/deny with no concept of scope, task, or risk level. You either trust everything or trust nothing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how" id="how">
+        <div class="container">
+            <div class="section-label">How It Works</div>
+            <div class="section-title">Three steps. One permission scope.</div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>Define the Task</h3>
+                    <p>Tell AgentScope what you're building. It understands scope, risk level, and boundaries.</p>
+                    <code>$ agentscope init "Refactor auth module and add tests"</code>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>Auto-Approve Safe Actions</h3>
+                    <p>Reads, searches, local edits, and tests run without prompts. Dangerous actions get flagged for review.</p>
+                    <code>✓ Read files · ✓ Run tests · ⚠ Git push · ✗ Delete database</code>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>Review & Learn</h3>
+                    <p>After each session, review what was auto-approved. AgentScope learns your preferences for next time.</p>
+                    <code>Session complete: 847 auto-approved, 3 flagged, 0 incidents</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo" id="demo">
+        <div class="container">
+            <div class="section-label">Live Demo</div>
+            <div class="section-title">See AgentScope in action.</div>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dot r"></div>
+                    <div class="terminal-dot y"></div>
+                    <div class="terminal-dot g"></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="prompt">$</span> <span class="cmd">agentscope run "Add payment flow"</span><br><br>
+                    <span class="comment">▸ Scanning task scope...</span><br>
+                    <span class="comment">▸ Risk profile: moderate (financial code)</span><br>
+                    <span class="comment">▸ Permission scope: read, edit, test</span><br><br>
+                    <span class="ok">✓</span> <span class="comment">Read src/payments/*.ts</span> <span class="ok">(auto-approved)</span><br>
+                    <span class="ok">✓</span> <span class="comment">Read src/stripe/config.ts</span> <span class="ok">(auto-approved)</span><br>
+                    <span class="ok">✓</span> <span class="comment">Edit src/payments/checkout.ts</span> <span class="ok">(auto-approved)</span><br>
+                    <span class="ok">✓</span> <span class="comment">Edit src/payments/webhook.ts</span> <span class="ok">(auto-approved)</span><br>
+                    <span class="ok">✓</span> <span class="comment">Run npm test -- --filter=payments</span> <span class="ok">(auto-approved)</span><br>
+                    <span class="warn">⚠</span> <span class="warn">git push origin main — FLAGGED (push to main)</span><br>
+                    <span class="comment">&nbsp;&nbsp;↳ Review at: agentscope.dev/review/8f3a</span><br>
+                    <span class="deny">✗</span> <span class="comment">Run deploy script — DENIED (outside scope)</span><br><br>
+                    <span class="comment">▸ Session complete: 5 auto, 1 flagged, 1 denied</span><br>
+                    <span class="comment">▸ Time saved: ~12 minutes of approval clicks</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="proof">
+        <div class="container">
+            <div class="stats">
+                <div>
+                    <div class="stat-num">73%</div>
+                    <div class="stat-label">of devs auto-approve<br>without reading</div>
+                </div>
+                <div>
+                    <div class="stat-num">50+</div>
+                    <div class="stat-label">permission prompts<br>per coding session</div>
+                </div>
+                <div>
+                    <div class="stat-num">12min</div>
+                    <div class="stat-label">wasted per session<br>on approval clicks</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-label">Pricing</div>
+            <div class="section-title">Simple. No per-seat traps.</div>
+            <div class="price-grid">
+                <div class="price-card">
+                    <h3>Solo</h3>
+                    <div class="price">$0<span>/mo</span></div>
+                    <div class="price-desc">For individual developers</div>
+                    <ul class="feature-list">
+                        <li>Local CLI tool</li>
+                        <li>Unlimited tasks</li>
+                        <li>Basic risk detection</li>
+                        <li>Session history (7 days)</li>
+                        <li>Community support</li>
+                    </ul>
+                    <a href="#waitlist" class="btn-secondary" style="width:100%;text-align:center;">Get Started Free</a>
+                </div>
+                <div class="price-card featured">
+                    <h3>Team</h3>
+                    <div class="price">$19<span>/mo</span></div>
+                    <div class="price-desc">For teams shipping with agents</div>
+                    <ul class="feature-list">
+                        <li>Everything in Solo</li>
+                        <li>Shared permission policies</li>
+                        <li>Team audit log</li>
+                        <li>Custom risk rules</li>
+                        <li>MCP server integration</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <a href="#waitlist" class="btn-primary" style="width:100%;text-align:center;">Join Early Access</a>
+                </div>
+                <div class="price-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <div class="price-desc">For regulated industries</div>
+                    <ul class="feature-list">
+                        <li>Everything in Team</li>
+                        <li>SSO / SAML</li>
+                        <li>Custom compliance rules</li>
+                        <li>On-prem deployment</li>
+                        <li>SLA + dedicated support</li>
+                    </ul>
+                    <a href="mailto:enterprise@agentscope.dev" class="btn-secondary" style="width:100%;text-align:center;">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta" id="waitlist">
+        <div class="container">
+            <h2>Stop clicking. Start shipping.</h2>
+            <p>Join 2,400+ developers who are tired of permission fatigue.</p>
+            <form class="waitlist-form" id="waitlistForm">
+                <input type="email" placeholder="you@company.com" required id="emailInput">
+                <button type="submit">Join Waitlist</button>
+            </form>
+            <div class="form-success" id="formSuccess">✓ You're on the list. We'll be in touch.</div>
+            <p style="margin-top: 24px; font-size: 0.85rem; color: var(--text-muted);">No spam. Early access ships Q3 2026.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 AgentScope. Built for developers who ship fast — safely.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const btn = e.target.querySelector('button');
+            
+            btn.textContent = 'Joining...';
+            btn.disabled = true;
+            
+            // Log signup
+            const signup = { email, ts: new Date().toISOString(), source: 'landing_page' };
+            console.log('WAITLIST_SIGNUP', JSON.stringify(signup));
+            
+            // Store locally for now
+            const signups = JSON.parse(localStorage.getItem('agentscope_signups') || '[]');
+            signups.push(signup);
+            localStorage.setItem('agentscope_signups', JSON.stringify(signups));
+            
+            // Show success
+            document.getElementById('formSuccess').style.display = 'block';
+            e.target.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
