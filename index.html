@@ -389,8 +389,10 @@
         <div class="container">
             <h2>Stop clicking. Start shipping.</h2>
             <p>Join 2,400+ developers who are tired of permission fatigue.</p>
-            <form class="waitlist-form" id="waitlistForm">
-                <input type="email" placeholder="you@company.com" required id="emailInput">
+            <form class="waitlist-form" id="waitlistForm" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+                <input type="hidden" name="form-name" value="waitlist">
+                <p style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+                <input type="email" name="email" placeholder="you@company.com" required id="emailInput">
                 <button type="submit">Join Waitlist</button>
             </form>
             <div class="form-success" id="formSuccess">✓ You're on the list. We'll be in touch.</div>
@@ -407,24 +409,35 @@
     <script>
         document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button');
             const email = document.getElementById('emailInput').value;
-            const btn = e.target.querySelector('button');
             
             btn.textContent = 'Joining...';
             btn.disabled = true;
             
-            // Log signup
-            const signup = { email, ts: new Date().toISOString(), source: 'landing_page' };
-            console.log('WAITLIST_SIGNUP', JSON.stringify(signup));
-            
-            // Store locally for now
-            const signups = JSON.parse(localStorage.getItem('agentscope_signups') || '[]');
-            signups.push(signup);
-            localStorage.setItem('agentscope_signups', JSON.stringify(signups));
-            
-            // Show success
-            document.getElementById('formSuccess').style.display = 'block';
-            e.target.style.display = 'none';
+            try {
+                const resp = await fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'form-name': 'waitlist',
+                        'bot-field': '',
+                        'email': email
+                    }).toString()
+                });
+                
+                if (resp.ok) {
+                    document.getElementById('formSuccess').style.display = 'block';
+                    form.style.display = 'none';
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (err) {
+                btn.textContent = 'Try again';
+                btn.disabled = false;
+                console.error('Waitlist signup error:', err);
+            }
         });
     </script>
 </body>
