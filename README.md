@@ -1,8 +1,8 @@
-# AgentScope
+# agentscope
 
 **AI Agent Permissions, Without the Pain.**
 
-Stop approving every command. AgentScope gives your AI agents task-based authorization — approve the mission, not every mouse click.
+Stop approving every command. agentscope gives your AI agents task-based authorization — approve the mission, not every mouse click.
 
 ## Problem
 
@@ -13,9 +13,9 @@ Current AI coding agents (Claude Code, Codex, Cursor, OpenCode) have broken perm
 
 ## Solution
 
-AgentScope introduces **task-based authorization**:
+agentscope introduces **task-based authorization**:
 
-1. **Define the task** — tell AgentScope what you're building
+1. **Define the task** — tell agentscope what you're building
 2. **Auto-approve safe actions** — reads, searches, local edits, tests run without prompts
 3. **Flag risky actions** — git push, deploy, env access get flagged for review
 4. **Deny dangerous actions** — database drops, credential access blocked by default
@@ -25,8 +25,6 @@ AgentScope introduces **task-based authorization**:
 ```bash
 # Install
 pip install agentscope
-# or
-npm install -g agentscope
 
 # Initialize
 agentscope init "Add payment flow to checkout"
@@ -49,7 +47,10 @@ agentscope status
 
 ## Configuration
 
-AgentScope stores config in `~/.agentscope/config.json`:
+agentscope stores config in OS-standard locations:
+- macOS: `~/Library/Application Support/agentscope/`
+- Linux: `~/.config/agentscope/`
+- Windows: `%APPDATA%/agentscope/`
 
 ```json
 {
@@ -62,15 +63,26 @@ AgentScope stores config in `~/.agentscope/config.json`:
 
 ## Pricing
 
-- **Solo** (Free): Local CLI, unlimited tasks, basic risk detection
+- **Solo** (Free): Local CLI, basic risk detection, 7-day local history
 - **Team** ($19/mo): Shared policies, team audit log, custom rules, MCP integration
 - **Enterprise** (Custom): SSO, compliance rules, on-prem, SLA
+
+## Platforms
+
+| OS | Status |
+|---|---|
+| macOS | ✅ Fully supported |
+| Linux | ✅ Fully supported (including headless/Docker) |
+| Windows | ✅ Fully supported (cmd.exe, PowerShell, WSL) |
 
 ## Status
 
 - [x] CLI prototype v0.1.0
 - [x] Risk classification engine
 - [x] Session logging
+- [x] Cross-platform support (macOS, Linux, Windows)
+- [x] OS keychain integration
+- [x] Tamper-evident logs
 - [ ] MCP server integration
 - [ ] Web dashboard
 - [ ] Team features
@@ -82,4 +94,4 @@ MIT
 
 ---
 
-Built by [Kepler](https://github.com/seanfzc) — the revenue-hunting AI agent.
+Built by [ObserveCo](https://observeco.ai) — See it. Fix it.
