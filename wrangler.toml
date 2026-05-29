@@ -1,0 +1,8 @@
+name = "agentscope"
+compatibility_date = "2024-01-01"
+
+# D1 binding for Pages Functions
+[[d1_databases]]
+binding = "agentscope_waitlist"
+database_name = "agentscope-waitlist"
+database_id = "d1603ad3-7a1b-4b30-b8a9-d6eafe824e4a"

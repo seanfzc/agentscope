@@ -389,9 +389,7 @@
         <div class="container">
             <h2>Stop clicking. Start shipping.</h2>
             <p>Join 2,400+ developers who are tired of permission fatigue.</p>
-            <form class="waitlist-form" id="waitlistForm" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-                <input type="hidden" name="form-name" value="waitlist">
-                <p style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+            <form class="waitlist-form" id="waitlistForm">
                 <input type="email" name="email" placeholder="you@company.com" required id="emailInput">
                 <button type="submit">Join Waitlist</button>
             </form>
@@ -417,14 +415,10 @@
             btn.disabled = true;
             
             try {
-                const resp = await fetch('/', {
+                const resp = await fetch('/api/waitlist', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({
-                        'form-name': 'waitlist',
-                        'bot-field': '',
-                        'email': email
-                    }).toString()
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
                 });
                 
                 if (resp.ok) {
